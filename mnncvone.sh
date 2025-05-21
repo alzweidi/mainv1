@@ -41,32 +41,21 @@ else
 fi
 cd "$PROJECT_DIR"
 
-### 4. Clone Repo & Pull Latest
-echo "[4/7] Cloning or updating Nockchain repo..."
-if [ ! -d "$PROJECT_DIR" ]; then
-  git clone "$REPO_URL" "$PROJECT_DIR"
-else
-  cd "$PROJECT_DIR"
-  git reset --hard HEAD && git pull origin main
-fi
-cd "$PROJECT_DIR"
-
-### 5. Setup .env BEFORE building (fixes make error)
-echo "[5/7] Creating .env file..."
+### 4. Setup .env BEFORE building (fixes make error)
+echo "[4/7] Creating .env file..."
 cp -f .env_example .env
 sed -i "s|^MINING_PUBKEY=.*|MINING_PUBKEY=$PUBKEY|" "$ENV_FILE"
 grep "MINING_PUBKEY" "$ENV_FILE"
 
-### 6. Build Nockchain
-echo "[6/7] Building Nockchain..."
+### 5. Build Nockchain
+echo "[5/7] Building Nockchain..."
 make install-hoonc
 make build
 make install-nockchain
 make install-nockchain-wallet
 
-
-### 7. Start Miner
-echo "[7/7] Launching miner in tmux..."
+### 6. Start Miner
+echo "[6/7] Launching miner in tmux..."
 tmux kill-session -t "$TMUX_SESSION" 2>/dev/null || true
 tmux new-session -d -s "$TMUX_SESSION" "cd $PROJECT_DIR && make run-nockchain | tee -a miner.log"
 
