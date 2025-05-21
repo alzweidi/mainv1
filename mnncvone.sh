@@ -43,11 +43,22 @@ fi
 
 cd "$PROJECT_DIR"
 
+
 ### 4. Setup .env BEFORE building (fixes make error)
+
 echo "[4/7] Creating .env file..."
 cp -f .env_example .env
 sed -i "s|^MINING_PUBKEY=.*|MINING_PUBKEY=$PUBKEY|" "$ENV_FILE"
 grep "MINING_PUBKEY" "$ENV_FILE"
+
+# Paranoid fallback: force pubkey override inside Makefile as well
+sed -i "s|^export MINING_PUBKEY.*|export MINING_PUBKEY := $PUBKEY|" "$PROJECT_DIR/Makefile"
+
+# Confirm both .env and Makefile have the correct pubkey
+echo "[DEBUG] Confirming pubkey injection..."
+grep "MINING_PUBKEY" "$ENV_FILE"
+grep "MINING_PUBKEY" "$PROJECT_DIR/Makefile"
+
 
 ### 5. Build Nockchain
 echo "[5/7] Building Nockchain..."
