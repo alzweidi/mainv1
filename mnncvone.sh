@@ -33,12 +33,14 @@ sudo apt update && sudo apt install -y \
 
 ### 3. Clone Repo & Pull Latest
 echo "[3/7] Cloning or updating Nockchain repo..."
+
 if [ ! -d "$PROJECT_DIR" ]; then
-  git clone "$REPO_URL" "$PROJECT_DIR"
+  git clone --depth 1 --branch master "$REPO_URL" "$PROJECT_DIR"
 else
   cd "$PROJECT_DIR"
-  git reset --hard HEAD && git pull origin main
+  git reset --hard HEAD && git pull origin master
 fi
+
 cd "$PROJECT_DIR"
 
 ### 4. Setup .env BEFORE building (fixes make error)
