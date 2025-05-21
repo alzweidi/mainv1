@@ -41,21 +41,29 @@ else
 fi
 cd "$PROJECT_DIR"
 
-### 4. Install Hoon Compiler (if needed)
-echo "[4/7] Installing Hoon compiler..."
-make install-hoonc
+### 4. Clone Repo & Pull Latest
+echo "[4/7] Cloning or updating Nockchain repo..."
+if [ ! -d "$PROJECT_DIR" ]; then
+  git clone "$REPO_URL" "$PROJECT_DIR"
+else
+  cd "$PROJECT_DIR"
+  git reset --hard HEAD && git pull origin main
+fi
+cd "$PROJECT_DIR"
 
-### 5. Build Nockchain Binaries
-echo "[5/7] Building project..."
+### 5. Setup .env BEFORE building (fixes make error)
+echo "[5/7] Creating .env file..."
+cp -f .env_example .env
+sed -i "s|^MINING_PUBKEY=.*|MINING_PUBKEY=$PUBKEY|" "$ENV_FILE"
+grep "MINING_PUBKEY" "$ENV_FILE"
+
+### 6. Build Nockchain
+echo "[6/7] Building Nockchain..."
+make install-hoonc
 make build
 make install-nockchain
 make install-nockchain-wallet
 
-### 6. Configure Miner PubKey in .env
-echo "[6/7] Injecting MINING_PUBKEY into .env..."
-cp -f .env_example .env
-sed -i "s|^MINING_PUBKEY=.*|MINING_PUBKEY=$PUBKEY|" "$ENV_FILE"
-grep "MINING_PUBKEY" "$ENV_FILE"
 
 ### 7. Start Miner
 echo "[7/7] Launching miner in tmux..."
